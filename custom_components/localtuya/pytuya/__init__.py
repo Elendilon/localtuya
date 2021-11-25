@@ -495,7 +495,9 @@ class TuyaProtocol(asyncio.Protocol, ContextualLogger):
     async def status(self):
         """Return device status."""
         status = await self.exchange(STATUS)
-        if status and "dps" in status:
+        if status and "dps" in status and not status["dps"]:
+            raise Exception(f"Received packet with empty DPS")
+        elif status and "dps" in status:
             self.dps_cache.update(status["dps"])
         return self.dps_cache
 
